@@ -1,8 +1,12 @@
 from justwatch import JustWatch
 
-nations = ["US", "CA", "MX"]
+# No English Sound: MX, BR, RU
+# No Func: NL, NO, SE, DK
+nations = ["US", "CA", "DE", "AT", "CH"
+					,"GB", "IE", "IT", "FR", "ES"
+					,"FI"]
 
-jw = JustWatch(country='MX')
+jw = JustWatch(country='FI')
 
 results = jw.search_for_item(query='aquaman')
 

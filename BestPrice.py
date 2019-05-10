@@ -1,6 +1,8 @@
 from justwatch import JustWatch
 
-jw = JustWatch(country='US')
+nations = ["US", "CA", "MX"]
+
+jw = JustWatch(country='MX')
 
 results = jw.search_for_item(query='aquaman')
 

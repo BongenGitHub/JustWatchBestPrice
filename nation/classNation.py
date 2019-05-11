@@ -20,14 +20,16 @@ class Nation:
 		
 		if len(results['items']) > 0:
 			item = results['items'][0]
-			offers = item['offers']
 			
-			flatrates = self.searchForFlatrate(offers)
-			ret.extend(flatrates)
-			
-			if len(ret) == 0:
-				minimum = self.searchForLowestPrice(offers)
-				ret.extend(minimum)
+			if 'offers' in item:
+				offers = item['offers']
+				
+				flatrates = self.searchForFlatrate(offers)
+				ret.extend(flatrates)
+				
+				if len(ret) == 0:
+					minimum = self.searchForLowestPrice(offers)
+					ret.extend(minimum)
 						
 		return ret
 		

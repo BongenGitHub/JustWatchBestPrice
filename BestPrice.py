@@ -2,25 +2,30 @@ from nation import Nation
 import requests
 import appex
 import sys
-	
+import clipboard
+
+		
 def getMovieName(url):
 	parts = url.split('/')
 	return parts[len(parts) - 1]
-	
+
+		
 def getCurrencyRate(fromCurrency, toCurrency):
 	rate = 1.0
-	if fromCurrency != toCurrency:		
+	if fromCurrency != toCurrency:
 		api_url = 'https://api.exchangeratesapi.io/latest?base={}&symbols={}'.format(fromCurrency, toCurrency)
 		r = requests.get(api_url)
-		r.raise_for_status()   # Raises requests.exceptions.HTTPError if r.status_code != 200
+		r.raise_for_status() # Raises requests.exceptions.HTTPError if r.status_code != 200
 		json = r.json()
-		rate = json['rates'][toCurrency] 
+		rate = json['rates'][toCurrency]
 	return rate
-	
+
+		
 def addCompareCurrencyFields(anOffer, anAmount, aCurrency):
 	anOffer['compare_price'] = anAmount
 	anOffer['compare_currency'] = aCurrency
 	return anOffer
+
 
 def addCurrency(someOffers, toCurrency):
 	if len(someOffers) > 0:
@@ -34,9 +39,10 @@ def addCurrency(someOffers, toCurrency):
 			rate = getCurrencyRate(fromCurrency, toCurrency)
 			newAmount = round(amount * rate, 2)
 			
-		return [addCompareCurrencyFields(x, newAmount, toCurrency) for x in someOffers]	
+		return [addCompareCurrencyFields(x, newAmount, toCurrency) for x in someOffers]
 	else:
 		return
+	
 	
 def searchBestPrice(url):
 	# No English Sound: MX, BR, RU
@@ -55,46 +61,51 @@ def searchBestPrice(url):
 	results = [nat.getMinimumPrice(movieName) for nat in nations]
 	return results
 	
-def sortOffer(val): 
-    return val[0]['compare_price']
+	
+def sortOffer(val):
+	return val[0]['compare_price']
+
 
 def printOffer(anOffer):
 	urls = anOffer['urls']
 	deeplink = "deeplink_{}".format(sys.platform)
 	urlType = deeplink
-	if not urlType in urls:
+	if urlType not in urls:
 		urlType = "standard_web"
 	
 	text = "\t {}".format(urls[urlType])
 	print(text)
-	
+
+		
 def printNationOffer(someNationOffers):
 	if len(someNationOffers) > 0:
 		offer = someNationOffers[0]
-		text = "{} {} ({})".format(offer['compare_price'], offer['compare_currency'], offer['country'])
+		text = "{price} {currency} ({country})".format(
+																price=offer['compare_price'],
+																currency=offer['compare_currency'],
+																country=offer['country'])
 		print(text)
 		[printOffer(x) for x in someNationOffers]
 		
 
 def main():
 	url = ""
-	if len(sys.argv) == 2:
-		url = sys.argv[1]
+	url = sys.arg[1] if len(sys.argv) == 2 else clipboard.get()
+
 	if not url:
 		print('No input URL found.')
 		return
 
-	print("searching for best prices...")
+	print("searching best prices for {movie}...".format(movie=getMovieName(url)))
 	nationOffers = searchBestPrice(url)
 	
 	print("comparing prices...")
-	compareOffers = [addCurrency(x, "EUR") for x in nationOffers if len(x) > 0] #make offers comparable and remove empty ones
-	compareOffers.sort(key = sortOffer, reverse=True)
+	# make offers comparable and remove empty ones
+	compareOffers = [addCurrency(x, "EUR") for x in nationOffers if len(x) > 0]
+	compareOffers.sort(key=sortOffer, reverse=True)
 	
-	print("-->best prices for {}<--".format(getMovieName(url)))
 	[printNationOffer(offer) for offer in compareOffers]
 	
-
 
 if __name__ == '__main__':
 	main()

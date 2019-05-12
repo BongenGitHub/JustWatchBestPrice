@@ -38,6 +38,7 @@ def main():
 		print('No input URL found.')
 		return
 
+	print("initialize JustWatch nations for search...")
 	# No English Sound: MX, BR, RU
 	nations = [
 							Nation("US"), Nation("CA"),

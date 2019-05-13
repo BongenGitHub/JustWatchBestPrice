@@ -49,11 +49,14 @@ def searchAndPrintOffers(nations, originalItem, aCurrency):
 
     print("searching best prices for \"{movie}\"...".format(movie=originalItem['original_title']))
     nationOffers = best.searchBestPrice(originalItem)
+    nationOffers = [offer for offer in nationOffers if len(offer) > 0]
 
-    print("comparing prices...")
-    compareOffers = best.comparePrices(nationOffers, aCurrency)
-
-    [printNationOffer(offer) for offer in compareOffers]		
+    if not nationOffers:
+        print("No offers found!")
+    else:
+        print("comparing prices...")
+        compareOffers = best.comparePrices(nationOffers, aCurrency)
+        [printNationOffer(offer) for offer in compareOffers]		
 
 
 def main():
@@ -64,7 +67,7 @@ def main():
 		return	
 	originalItem = getOriginalItem(url)
 	if not originalItem:
-		print('Input is not an JustWatch URL: "{}"'.format(url))
+		print('Input is not a JustWatch URL: "{}"'.format(url))
 		return
 
 	print("initialize JustWatch nations for search...")

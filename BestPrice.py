@@ -9,20 +9,9 @@ if sys.platform == "ios":
 else:
 	import pyperclip
 	clip_get = pyperclip.paste
-	
-											
-def getOriginalItem(url):
-	parts = url.split('/')
-	if len(parts) >= 6 and parts[2] == "www.justwatch.com":
-		country = parts[3].upper()
-		title = parts[5]
-		nation = Nation(country)
-		return nation.getItem(title)
-
-	return ""
 
 
-def printOffer(anOffer):
+def print_offer(anOffer):
 	urls = anOffer['urls']
 	deeplink = "deeplink_{}".format(sys.platform)
 	urlType = deeplink
@@ -33,7 +22,7 @@ def printOffer(anOffer):
 	print(text)
 
 		
-def printNationOffer(someNationOffers):
+def print_nation_offer(someNationOffers):
 	if len(someNationOffers) > 0:
 		offer = someNationOffers[0]
 		text = "{price} {currency} ({country})".format(
@@ -41,22 +30,22 @@ def printNationOffer(someNationOffers):
 																currency=offer['compare_currency'],
 																country=offer['country'])
 		print(text)
-		[printOffer(x) for x in someNationOffers]
+		[print_offer(x) for x in someNationOffers]
 
 
-def searchAndPrintOffers(nations, originalItem, aCurrency):
-    best = JwBestPrice(nations) 
+def search_and_print_offers(someNations, anOriginalItem, aCurrency):
+    best = JwBestPrice(someNations) 
 
-    print("searching best prices for \"{movie}\"...".format(movie=originalItem['original_title']))
-    nationOffers = best.searchBestPrice(originalItem)
+    print("searching best prices for \"{movie}\"...".format(movie=anOriginalItem['original_title']))
+    nationOffers = best.search_best_price(anOriginalItem)
     nationOffers = [offer for offer in nationOffers if len(offer) > 0]
 
     if not nationOffers:
         print("No offers found!")
     else:
         print("comparing prices...")
-        compareOffers = best.comparePrices(nationOffers, aCurrency)
-        [printNationOffer(offer) for offer in compareOffers]		
+        compareOffers = best.compare_prices(nationOffers, aCurrency)
+        [print_nation_offer(offer) for offer in compareOffers]		
 
 
 def main():
@@ -65,7 +54,7 @@ def main():
 	if not url:
 		print('No input found.')
 		return	
-	originalItem = getOriginalItem(url)
+	originalItem = JwBestPrice.get_original_item(url)
 	if not originalItem:
 		print('Input is not a JustWatch URL: "{}"'.format(url))
 		return
@@ -84,7 +73,7 @@ def main():
 							Nation("MY"), Nation("PH"), Nation("SG"), Nation("ID")]
 	
 						
-	searchAndPrintOffers(nations, originalItem, "EUR")
+	search_and_print_offers(nations, originalItem, "EUR")
 	
 
 if __name__ == '__main__':

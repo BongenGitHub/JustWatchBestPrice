@@ -1,6 +1,5 @@
 from nation import Nation 
 import requests
-import appex
 
 
 class JwBestPrice:

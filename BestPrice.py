@@ -1,9 +1,15 @@
 from jwbestprice import JwBestPrice
 from nation import Nation
 import sys
-import clipboard
+
+if sys.platform == "ios":
+	import clipboard
+	clip_get = clipboard.get
+else:
+	import pyperclip
+	clip_get = pyperclip.paste
 	
-													
+											
 def getMovieName(url):
 	parts = url.split('/')
 	return parts[len(parts) - 1]
@@ -33,7 +39,7 @@ def printNationOffer(someNationOffers):
 
 def main():
 	url = ""
-	url = sys.argv[1] if len(sys.argv) == 2 else clipboard.get()
+	url = sys.argv[1] if len(sys.argv) == 2 else clip_get()
 	if not url:
 		print('No input URL found.')
 		return

@@ -14,14 +14,13 @@ class Nation:
 		result = self.api.get_providers()
 		self.providers = [x for x in result if x['clear_name'] in someProviders]
 		
-	def getMinimumPrice(self, aMovieName):
+	def getMinimumPrice(self, originalItem):
 		ret = []
-		results = self.api.search_for_item(query=aMovieName)
+		results = self.api.search_for_item(query=originalItem['original_title'])
 		
 		if len(results['items']) > 0:
 			item = results['items'][0]
-			
-			if 'offers' in item:
+			if item['id'] == originalItem['id'] and 'offers' in item:
 				offers = item['offers']
 				
 				flatrates = self.searchForFlatrate(offers)
@@ -54,6 +53,14 @@ class Nation:
 				rents = [x for x in rents if x['retail_price'] == lowest]
 				
 		return rents
+	
+	def getItem(self, aTitle):
+		results = self.api.search_for_item(query=aTitle)
+		if len(results['items']) > 0:
+			item = results['items'][0]
+			return item
+
+		return ""
 
 def debugMethod():
 	test = Nation("DE", ["Netflix", "Amazon Prime Video"])

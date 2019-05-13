@@ -2,6 +2,7 @@ from jwbestprice import JwBestPrice
 from nation import Nation
 import sys
 
+
 if sys.platform == "ios":
 	import clipboard
 	clip_get = clipboard.get
@@ -10,9 +11,15 @@ else:
 	clip_get = pyperclip.paste
 	
 											
-def getMovieName(url):
+def getOriginalItem(url):
 	parts = url.split('/')
-	return parts[len(parts) - 1]
+	if len(parts) >= 6 and parts[2] == "www.justwatch.com":
+		country = parts[3].upper()
+		title = parts[5]
+		nation = Nation(country)
+		return nation.getItem(title)
+
+	return ""
 
 
 def printOffer(anOffer):
@@ -35,13 +42,29 @@ def printNationOffer(someNationOffers):
 																country=offer['country'])
 		print(text)
 		[printOffer(x) for x in someNationOffers]
-		
+
+
+def searchAndPrintOffers(nations, originalItem, aCurrency):
+    best = JwBestPrice(nations) 
+
+    print("searching best prices for \"{movie}\"...".format(movie=originalItem['original_title']))
+    nationOffers = best.searchBestPrice(originalItem)
+
+    print("comparing prices...")
+    compareOffers = best.comparePrices(nationOffers, aCurrency)
+
+    [printNationOffer(offer) for offer in compareOffers]		
+
 
 def main():
 	url = ""
 	url = sys.argv[1] if len(sys.argv) == 2 else clip_get()
 	if not url:
-		print('No input URL found.')
+		print('No input found.')
+		return	
+	originalItem = getOriginalItem(url)
+	if not originalItem:
+		print('Input is not an JustWatch URL: "{}"'.format(url))
 		return
 
 	print("initialize JustWatch nations for search...")
@@ -57,16 +80,8 @@ def main():
 							Nation("IN"), Nation("JP"), Nation("KR"), Nation("TH"),
 							Nation("MY"), Nation("PH"), Nation("SG"), Nation("ID")]
 	
-	movieName = getMovieName(url)					
-	best = JwBestPrice(nations)
-	
-	print("searching best prices for \"{movie}\"...".format(movie=movieName))
-	nationOffers = best.searchBestPrice(movieName)
-	
-	print("comparing prices...")
-	compareOffers = best.comparePrices(nationOffers, "EUR")
-	
-	[printNationOffer(offer) for offer in compareOffers]
+						
+	searchAndPrintOffers(nations, originalItem, "EUR")
 	
 
 if __name__ == '__main__':

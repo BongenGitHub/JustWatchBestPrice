@@ -7,8 +7,8 @@ class JwBestPrice:
 		self.nations = someNations
 		
 		
-	def searchBestPrice(self, movieName):
-		nationOffers = [nat.getMinimumPrice(movieName) for nat in self.nations]
+	def searchBestPrice(self, originalItem):
+		nationOffers = [nat.getMinimumPrice(originalItem) for nat in self.nations]
 		return nationOffers
 	
 	
